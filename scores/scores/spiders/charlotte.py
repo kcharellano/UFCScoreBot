@@ -2,7 +2,7 @@ import scrapy
 
 
 class ScoreSpider(scrapy.Spider):
-    name = "charlotte" 
+    name = "charlotte"
 
     def start_requests(self):
         queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last 
