@@ -1,4 +1,5 @@
 import scrapy
+from scores.items import ScoresItem
 
 
 class ScoreSpider(scrapy.Spider):
@@ -11,11 +12,19 @@ class ScoreSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        nextPage = response.xpath('//tbody/tr/td/a[text()="Chael"]/@href').extract()[0]
+        '''
+            Find fighter
+        '''
+        xpathStr = '//tbody/tr/td/a[text()="%s"]/@href' % self.first
+        nextPage = response.xpath(xpathStr).extract()[0]
         if nextPage is not None:
             yield response.follow(nextPage, callback=self.afterParse)
 
     def afterParse(self, response):
-        #self.log("++++++++++++" + "AFTER PARSE!!");
-        with open('example.html', 'wb') as f:
-            f.write(response.body);
+        '''
+            Extract record
+        '''
+        item = ScoresItem()
+        xpathStr = '//*[@class="b-content__title-record"]/text()'
+        item['record'] = response.xpath(xpathStr).extract()
+        return item        
