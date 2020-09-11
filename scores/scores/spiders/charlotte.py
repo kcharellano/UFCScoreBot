@@ -5,7 +5,7 @@ class ScoreSpider(scrapy.Spider):
     name = "charlotte"
 
     def start_requests(self):
-        queryUrl = 'http://www.ufcstats.com/statistics/fighters/search?query=' + self.last 
+        queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last 
         urls = [queryUrl]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
