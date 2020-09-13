@@ -3,6 +3,8 @@ import praw
 import sys
 import logging
 
+from time import sleep
+
 class UFCBot:
     def __init__(self):
         logging.info("Creating reddit instance")
@@ -10,16 +12,22 @@ class UFCBot:
     
     def start(self):
         logging.info("Starting bot")
+        logging.info("Press \'Ctrl + C\' to exit")
         while True:
             try:
-                '''
-                    Add things that the bot should be checking for
-                '''
-                pass
+                for mention in self.reddit.inbox.mentions():
+                    print(mention.body)
+                logging.info("Sleeping for 5 seconds")
+                sleep(5)
             except KeyboardInterrupt:
                 logging.info("Exiting Bot")
                 exit()
 
+    def parse(self, comment):
+        pass
+    
+    def runScraper(self):
+        pass
 
 
 if __name__ == "__main__":
