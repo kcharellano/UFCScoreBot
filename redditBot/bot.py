@@ -2,6 +2,7 @@
 import praw
 import sys
 import logging
+import os
 
 from time import sleep
 
@@ -16,7 +17,7 @@ class UFCBot:
         while True:
             try:
                 for mention in self.reddit.inbox.mentions():
-                    print(mention.body)
+                    self.runScraper()
                 logging.info("Sleeping for 5 seconds")
                 sleep(5)
             except KeyboardInterrupt:
@@ -27,7 +28,14 @@ class UFCBot:
         pass
     
     def runScraper(self):
-        pass
+        TOP_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        SCORES_DIR = os.path.join(TOP_DIR, "scores")
+        TEST_FILE = os.path.join(TOP_DIR, "scores", "scores", "spiders", "test2.py")
+        SPIDER_FILE = os.path.join(TOP_DIR, "scores", "scores", "spiders", "charlotte.py")
+        runCommand = "scrapy crawl -a last=sonnen -a first=Chael charlotte -o mydata.json"
+        if not os.getcwd() == SCORES_DIR:
+            os.chdir("scores")
+        os.system(runCommand)
 
 
 if __name__ == "__main__":
