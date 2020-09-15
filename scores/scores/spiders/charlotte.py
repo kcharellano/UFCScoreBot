@@ -6,7 +6,7 @@ class ScoreSpider(scrapy.Spider):
     name = "charlotte"
 
     def start_requests(self):
-        queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last 
+        queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last.strip().lower()
         urls = [queryUrl]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -14,9 +14,10 @@ class ScoreSpider(scrapy.Spider):
     def parse(self, response):
         '''
             Find fighter
+            TODO: What if queryUrl leads to empty fighter table?
         '''
-        xpathStr = '//tbody/tr/td/a[text()="%s"]/@href' % self.first
-        nextPage = response.xpath(xpathStr).extract()[0]
+        xpathStr = '//tbody/tr/td/a[contains(translate(text(), "ABCEDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnoqrstuvwxyz"), "{firstName}")]/@href'
+        nextPage = response.xpath(xpathStr.format(firstName=self.first.strip().lower())).extract()[0]
         if nextPage is not None:
             yield response.follow(nextPage, callback=self.afterParse)
 
