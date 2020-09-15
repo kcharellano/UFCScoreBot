@@ -40,10 +40,6 @@ class ScoreSpider(scrapy.Spider):
     def parse_fighters(self, response):
         '''
             Find fighter
-            TODO: What if queryUrl leads to empty fighter table?
-            TODO: Multiple fighters with same name
-            TODO: Multiple fighters
-            TODO: What if no match?
         '''
         xpathStr = '//tbody/tr/td/a[contains(translate(text(), "ABCEDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnoqrstuvwxyz"), "{firstName}")]/@href'
         href_list = response.xpath(xpathStr.format(firstName=self.first.strip().lower())).extract()
@@ -65,5 +61,10 @@ class ScoreSpider(scrapy.Spider):
         '''
         item = ScoresItem()
         xpathStr = '//*[@class="b-content__title-record"]/text()'
-        item['record'] = response.xpath(xpathStr).extract()
+        record_list = response.xpath(xpathStr).extract()
+        if(len(record_list) == 1):
+            item['record'] = record_list[0].strip()
+        else:
+            self.logger.warning("Haven't implemented multiple list record")
+            return
         return item        
