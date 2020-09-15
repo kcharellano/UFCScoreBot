@@ -42,15 +42,26 @@ class ScoreSpider(scrapy.Spider):
             Find fighter
             TODO: What if queryUrl leads to empty fighter table?
             TODO: Multiple fighters with same name
+            TODO: Multiple fighters
+            TODO: What if no match?
         '''
         xpathStr = '//tbody/tr/td/a[contains(translate(text(), "ABCEDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnoqrstuvwxyz"), "{firstName}")]/@href'
-        nextPage = response.xpath(xpathStr.format(firstName=self.first.strip().lower())).extract()[0]
-        if nextPage is not None:
-            yield response.follow(nextPage, callback=self.parse_stats, errback=errback_general)
+        href_list = response.xpath(xpathStr.format(firstName=self.first.strip().lower())).extract()
+        if len(href_list) == 0:
+            self.logger.debug("Found no match")
+            return
+        elif len(href_list) == 1:
+            self.logger.debug("Found 1 match")
+            yield response.follow(href_list[0], callback=self.parse_stats, errback=self.errback_general)
+        elif len(href_list) > 1:
+            self.logger.debug("Found multiple matches")
+            self.logger.warning("Haven't implemented multiple matches")
+            return
 
     def parse_stats(self, response):
         '''
             Extract record
+            TODO: Extract different record items
         '''
         item = ScoresItem()
         xpathStr = '//*[@class="b-content__title-record"]/text()'
