@@ -14,7 +14,7 @@ class ScoreSpider(scrapy.Spider):
         '''
             TODO: How to handle different http return codes
         '''
-        queryUrl = "http://www.ufcstats.com/stat123istics/fighters/search?query=" + self.last.strip().lower()
+        queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last.strip().lower()
         urls = [queryUrl]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse_fighters, errback=self.errback_general)
