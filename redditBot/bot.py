@@ -6,6 +6,10 @@ import os
 
 from time import sleep
 
+TOP_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+SCORES_DIR = os.path.join(TOP_DIR, "scores")
+SPIDER_FILE = os.path.join(TOP_DIR, "scores", "scores", "spiders", "charlotte.py")
+
 class UFCBot:
     def __init__(self):
         logging.info("Creating reddit instance")
@@ -17,25 +21,28 @@ class UFCBot:
         while True:
             try:
                 for mention in self.reddit.inbox.mentions():
-                    self.runScraper()
-                logging.info("Sleeping for 5 seconds")
-                sleep(5)
+                    args = self.parse(mention.body)
+                    if args != None:
+                        self.runScraper(args)
+                logging.info("Checking for mentions again in 10 seconds...")
+                sleep(10)
             except KeyboardInterrupt:
                 logging.info("Exiting Bot")
                 exit()
 
     def parse(self, comment):
-        pass
+        args_list = comment.split(" ")
+        if len(args_list) != 3:
+            logging.warning("Haven't implemented parsing for more/less than 3 words -- bot will not run spider")
+            return None
+        args_dict = {"first": args_list[1], "last": args_list[2]}
+        return args_dict
     
-    def runScraper(self):
-        TOP_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        SCORES_DIR = os.path.join(TOP_DIR, "scores")
-        TEST_FILE = os.path.join(TOP_DIR, "scores", "scores", "spiders", "test2.py")
-        SPIDER_FILE = os.path.join(TOP_DIR, "scores", "scores", "spiders", "charlotte.py")
-        runCommand = "scrapy crawl -a last=sonnen -a first=Chael charlotte -o mydata.json"
+    def runScraper(self, args):
+        runCommand = "scrapy crawl -a last={last_name} -a first={first_name} charlotte -o scrapy_output.json"
         if not os.getcwd() == SCORES_DIR:
             os.chdir("scores")
-        os.system(runCommand)
+        os.system(runCommand.format(last_name=args["last"], first_name=args["first"]))
 
 
 if __name__ == "__main__":

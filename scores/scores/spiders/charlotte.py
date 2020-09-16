@@ -41,8 +41,13 @@ class ScoreSpider(scrapy.Spider):
         '''
             Find fighter
         '''
-        xpathStr = '//tbody/tr/td/a[contains(translate(text(), "ABCEDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnoqrstuvwxyz"), "{firstName}")]/@href'
-        href_list = response.xpath(xpathStr.format(firstName=self.first.strip().lower())).extract()
+        cleaned_first = self.first.strip()
+        xpathStr = "//tbody/tr/td/a[contains(translate(text(), '{upper_case}', '{lower_case}'), '{first_name}')]/@href"
+        href_list = response.xpath(xpathStr.format(
+            upper_case=cleaned_first.upper(),
+            lower_case=cleaned_first.lower(),
+            first_name=cleaned_first.lower()
+        )).extract()
         if len(href_list) == 0:
             self.logger.debug("Found no match")
             return
