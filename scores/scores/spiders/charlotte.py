@@ -1,11 +1,11 @@
 import scrapy
 import sys
+import os
 
 from scores.items import ScoresItem
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
-
 
 class ScoreSpider(scrapy.Spider):
     name = "charlotte"
@@ -14,6 +14,7 @@ class ScoreSpider(scrapy.Spider):
         '''
             TODO: How to handle different http return codes
         '''
+        self.logger.debug("Initiating request")
         queryUrl = "http://www.ufcstats.com/statistics/fighters/search?query=" + self.last.strip().lower()
         urls = [queryUrl]
         for url in urls:
@@ -41,6 +42,7 @@ class ScoreSpider(scrapy.Spider):
         '''
             Find fighter
         '''
+        self.logger.debug("Looking at fighter list")
         cleaned_first = self.first.strip()
         xpathStr = "//tbody/tr/td/a[contains(translate(text(), '{upper_case}', '{lower_case}'), '{first_name}')]/@href"
         href_list = response.xpath(xpathStr.format(
@@ -64,10 +66,12 @@ class ScoreSpider(scrapy.Spider):
             Extract record
             TODO: Extract different record items
         '''
+        self.logger.debug("Creating item")
         item = ScoresItem()
         xpathStr = '//*[@class="b-content__title-record"]/text()'
         record_list = response.xpath(xpathStr).extract()
         if(len(record_list) == 1):
+            self.logger.debug("Storing record in item")
             item['record'] = record_list[0].strip()
         else:
             self.logger.warning("Haven't implemented multiple list record")

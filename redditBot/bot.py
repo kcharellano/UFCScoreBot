@@ -39,7 +39,7 @@ class UFCBot:
         return args_dict
     
     def runScraper(self, args):
-        runCommand = "scrapy crawl -a last={last_name} -a first={first_name} charlotte -o scrapy_output.json"
+        runCommand = "scrapy crawl -a last={last_name} -a first={first_name} charlotte"
         if not os.getcwd() == SCORES_DIR:
             os.chdir("scores")
         os.system(runCommand.format(last_name=args["last"], first_name=args["first"]))
